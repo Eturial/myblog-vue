@@ -1,6 +1,5 @@
-# myblog2.0
-## 个人博客2.0
-基于1.0做了一些调整
+# myblog
+## 个人博客
 
 ## Project setup
 ```
