@@ -1,5 +1,5 @@
 <!-- 文章详情模块 -->
-<template>
+<template xmlns:vue-markdown="http://www.w3.org/1999/xhtml">
 <div class="detailBox tcommonBox">
   <span class="s-round-date">
     <span class="month">{{detailObj.createTime.substring(5,7) + "月"}}</span>
@@ -23,7 +23,9 @@
       <a :href="'#/Share?classId='+detailObj.tagId">{{detailObj.tagName}}</a>
     </div>
   </header>
-  <div v-highlight class="article-content" v-html="detailObj.content"></div>
+  <div class="article-content" @click = change>
+    <p v-html="md"></p>
+  </div>
   <div class="dshareBox bdsharebuttonbox" data-tag="share_1">
     分享到:
     <a href="javascript:void(0);" class="ds-weibo fa fa-fw fa-weibo" data-cmd="tsina"></a>
@@ -59,6 +61,7 @@
 
 <script>
     import axios from 'axios';
+    import markdown from 'marked';
 // import {getArticleInfo,getArtLikeCollect,initDate} from '../utils/server.js'
 export default {
 name: 'Detail',
@@ -74,9 +77,17 @@ data () { //选项 / 数据
     haslogin: false,//是否已经登录
     userId: '',//用户id
     create_time: '',
-    content: ''
+    content: '',
+    md:''
   }
 },
+    computed: {
+      markdown() {
+          const md = new markdown();
+          const result = md.render(this.content);
+          return result;
+      }
+    },
 mounted(){
     console.log(this.$route.params.id);
     axios({
@@ -84,6 +95,7 @@ mounted(){
         method : 'get',
     }).then((res)=>{
         this.detailObj = res.data;
+        this.msg = this.detailObj.content;
         this.likeCount = this.detailObj.thumbs;
         console.log(this.detailObj);
     })
@@ -102,6 +114,9 @@ methods: { //事件处理器
         })
         this.likeArt = true;
         this.likeCount += 1;
+    },
+    change() {
+        this.md = markdown(this.detailObj.content);
     }
 },
   routeChange: function () {

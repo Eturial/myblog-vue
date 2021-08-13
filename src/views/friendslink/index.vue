@@ -21,6 +21,7 @@ import {mapState} from 'vuex'
 //import axios from "axios";
 import pic1 from '@/assets/img/friends/friend1.jpg'
 import pic2 from '@/assets/img/friends/avatar.jpg'
+import pic3 from '@/assets/img/friends/yck.jpg'
 export default {
   name: 'Friendslink',
     data() { //选项 / 数据
@@ -39,10 +40,10 @@ export default {
                 description: 'hexo博客'
               },
               {
-                image: '',
-                url: 'http://www.baidu.com',
-                name: '友3',
-                description: '描述描述描述'
+                image: pic3,
+                url: 'https://www.cnblogs.com/ranbom/\n',
+                name: 'LeoRanbom',
+                description: 'yu总np'
               },
               {
                 image: '',
