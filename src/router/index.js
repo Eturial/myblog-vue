@@ -41,7 +41,7 @@ export default new Router({
             }
         },
         {
-            path: '/category',
+            path: '/category/:id',
             name: 'Category',
             component: category,
             meta: {

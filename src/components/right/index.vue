@@ -74,7 +74,7 @@
       </h2>
       <ul>
         <li v-for="(item,index) in browseList" :key="'browseList'+index">
-          <a :href="'#/DetailShare?aid='+item.id">{{item.title}}</a> —— {{item.browse_count}} 次围观
+          <a :href="'/detail/'+item.blogId">{{item.title}}</a> —— {{item.views}} 次围观
         </li>
       </ul>
     </section>
@@ -87,6 +87,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import axios from 'axios';
 export default {
   name: 'Right',
   data () {
@@ -96,23 +97,7 @@ export default {
       loveme: false,
       gotoTop: false,//返回顶部
       going: false,//是否正在执行上滑动作
-      browseList: [
-        {
-          id: '2',
-          title: 'ddsfsdfsdfsdfsd',
-          browse_count: '99999'
-        },
-        {
-          id: '3',
-          title: 'ddsfsdfsdfsdfsd',
-          browse_count: '99999'
-        },
-        {
-          id: '4',
-          title: 'ddsfsdfsdfsdfsd',
-          browse_count: '999998888'
-        }
-      ],//浏览量最多
+      browseList: [],//浏览量最多
       artCommentList: [
         {
           id: '1',
@@ -161,6 +146,15 @@ export default {
       'errorAvatar'
     ])
   },
+    mounted(){
+        axios({
+            url : 'http://localhost:14000/blog/mostViews',
+            method : 'get',
+        }).then((res)=>{
+            this.browseList = res.data;
+            console.log(this.browseList);
+        })
+    },
   methods: {
     lovemeFun () {
       if (!this.loveme) {

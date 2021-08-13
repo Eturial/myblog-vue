@@ -1,53 +1,58 @@
 <!-- 文章列表 -->
 <template>
   <el-row class="sharelistBox">
-    <!-- <div v-if="this.$route.name=='Share'&&!this.$route.query.keywords" class="shareTitle">
+
+    <div v-if="this.$route.name=='Share'&&!this.$route.query.keywords" class="shareTitle">
       <div class="ui label">
         <a :href="'#/Share?classId='+classId">{{className}}</a>
       </div>
-      <ul v-if="sonclassList" class="shareclassTwo">
-        <li v-for="(citem,index) in sonclassList">
-          <a :href="'#/Share?classId='+classId+'&classtwoId='+citem.class_id" :class="citem.class_id==classtwoId?'active':''">{{citem.cate_name}}</a>
-        </li>
-      </ul>
-    </div> -->
+      <!--<ul v-if="sonclassList" class="shareclassTwo">-->
+        <!--<li v-for="(citem,index) in sonclassList">-->
+          <!--<a :href="'#/Share?classId='+classId+'&classtwoId='+citem.class_id" :class="citem.class_id==classtwoId?'active':''">{{citem.cate_name}}</a>-->
+        <!--</li>-->
+      <!--</ul>-->
+    </div>
+
     <el-col :span="24" class="s-item tcommonBox" v-for="(item,index) in articleList" :key="'article'+index">
       <span class="s-round-date">
-        <span class="month" v-html="showInitDate(item.create_time,'month')+'月'"></span>
-        <span class="day" v-html="showInitDate(item.create_time,'date')"></span>
+        <span class="month">{{item.createTime.substring(5,7) + "月"}}</span>
+        <span class="day">{{item.createTime.substring(8,11)}}</span>
       </span>
       <header class="article-head">
         <h1 class="article-head-title">
-          <a :href="'#/DetailShare?aid='+item.id" target="_blank">
+          <a :href="'#/DetailShare?aid='+item.tagId" target="_blank">
             {{item.title}}
           </a>
+          <!--<router-link :to="{path:'/detail/', {params:{id : item.blogId}}">{{item.title}}</router-link>-->
         </h1>
         <h2 class="article-head-count">
           <i class="fa fa-fw fa-user"></i>发表于
-          <i class="fa fa-fw fa-clock-o"></i><span v-html="showInitDate(item.create_time,'all')">{{showInitDate(item.create_time,'all')}}</span> •
-          <i class="fa fa-fw fa-eye"></i>{{item.browse_count}} 次围观 •
-          <i class="fa fa-fw fa-comments"></i>活捉 {{item.comment_count}} 条 •
+          <i class="fa fa-fw fa-clock-o"></i><span>{{item.createTime}}</span> •
+          <i class="fa fa-fw fa-eye"></i>{{item.views}} 次围观 •
+          <i class="fa fa-fw fa-comments"></i>活捉 {{item.comment}} 条 •
           <span class="rateBox">
-            <i class="fa fa-fw fa-heart"></i>{{item.like_count?item.like_count:0}}点赞 •
-            <i class="fa fa-fw fa-star"></i>{{item.collect_count?item.collect_count:0}}收藏
+            <i class="fa fa-fw fa-heart"></i>{{item.thumbs}}点赞 •
           </span>
         </h2>
         <div class="ui label">
-          <a :href="'#/Share?classId='+item.class_id">{{item.cate_name}}</a>
+          <a :href="'#/Share?classId='+item.tagId">{{item.tagName}}</a>
         </div>
       </header>
       <div class="article-content">
         <div class="article-description" >
           {{item.description}}
         </div>
+        <br/>
         <div class="article-img">
-          <img :src="item.image" alt="" class="maxW">
+          <img :src="item.firstPicture" alt="" class="maxW">
         </div>
       </div>
       <div class="viewdetail">
-        <a class="tcolors-bg" :href="'/detail/'+item.id" target="_blank">
-          阅读全文
-          <i class="el-icon-d-arrow-right"></i>
+        <!--<span class="tcolors-bg" v-on="onClick(item.blogId)" target="_blank">-->
+          <!--<i class="el-icon-d-arrow-right">阅读全文</i>-->
+        <!--</span>-->
+        <a class="tcolors-bg" :href="'/detail/'+item.blogId" target="_blank">
+          <i class="el-icon-d-arrow-right">阅读全文</i>
         </a>
       </div>
     </el-col>
@@ -65,9 +70,12 @@
 
 <script>
 // import {ShowArticleAll,ArtClassData,initDate} from '../utils/server.js'
-import { initDate } from '@/utils/index.js'
+//import { initDate } from '@/utils/index.js'
+import axios from 'axios';
+
 export default {
   name: 'Share',
+
   data () { //选项 / 数据
     return {
       artId: 0,
@@ -79,123 +87,51 @@ export default {
       keywords: '',
       hasMore: true,
       level: 1,
-      shareClass: [
-        {
-          classId: 1, name: '技术分享', detshare: [
-            { classId: 5, name: '移动端H5', pid: 1 },
-            { classId: 6, name: 'pc端web', pid: 1 },
-            { classId: 7, name: '小程序', pid: 1 },
-            { classId: 8, name: 'php', pid: 1 },
-            { classId: 9, name: 'nodejs', pid: 1 },
-            { classId: 10, name: '软件', pid: 1 },
-            { classId: 11, name: '其他', pid: 1 }
-          ]
-        },
-        { classId: 2, name: '闲言碎语' },
-        { classId: 3, name: '事件簿' },
-        { classId: 4, name: '创作集' }
-      ],
+//      shareClass: [
+//        {
+//          classId: 1, name: '技术分享', detshare: [
+//            { classId: 5, name: '移动端H5', pid: 1 },
+//            { classId: 6, name: 'pc端web', pid: 1 },
+//            { classId: 7, name: '小程序', pid: 1 },
+//            { classId: 8, name: 'php', pid: 1 },
+//            { classId: 9, name: 'nodejs', pid: 1 },
+//            { classId: 10, name: '软件', pid: 1 },
+//            { classId: 11, name: '其他', pid: 1 }
+//          ]
+//        },
+//        { classId: 2, name: '闲言碎语' },
+//        { classId: 3, name: '事件簿' },
+//        { classId: 4, name: '创作集' }
+//      ],
       queryClass: 1,
-      articleList: [
-        {
-          'create_time': "2021-08-02 15:26:52",
-          'like_count': 55,
-          'browse_count': 333,
-          'collect_count': 88,
-          'cate_name': '分类标签',
-          'comment_count': 777,
-          'title': '文章标题',
-          'class_id': 3,
-          'description': 'ddwfwefwerwerwerwer',
-          'image': 'asdfdsf',
-          'id': 'sd'
-        },
-        {
-          'create_time': "2021-08-02 15:26:52",
-          'like_count': 55,
-          'browse_count': 333,
-          'collect_count': 88,
-          'cate_name': '分类标签',
-          'comment_count': 777,
-          'title': '文章标题',
-          'class_id': 3,
-          'description': 'ddwfwefwerwerwerwer',
-          'image': 'asdfdsf',
-          'id': 'sd'
-        },
-        {
-          'create_time': "2021-08-02 15:26:52",
-          'like_count': 55,
-          'browse_count': 333,
-          'collect_count': 88,
-          'cate_name': '分类标签',
-          'comment_count': 777,
-          'title': '文章标题',
-          'class_id': 3,
-          'description': 'ddwfwefwerwerwerwer',
-          'image': 'asdfdsf',
-          'id': 'sd'
-        },
-        {
-          'create_time': "2021-08-02 15:26:52",
-          'like_count': 55,
-          'browse_count': 333,
-          'collect_count': 88,
-          'cate_name': '分类标签',
-          'comment_count': 777,
-          'title': '文章标题',
-          'class_id': 3,
-          'description': 'ddwfwefwerwerwerwer',
-          'image': 'asdfdsf',
-          'id': 'sd'
-        },
-        {
-          'create_time': "2021-08-02 15:26:52",
-          'like_count': 55,
-          'browse_count': 333,
-          'collect_count': 88,
-          'cate_name': '分类标签',
-          'comment_count': 777,
-          'title': '文章标题',
-          'class_id': 3,
-          'description': 'ddwfwefwerwerwerwer',
-          'image': 'asdfdsf',
-          'id': 'sd'
-        }
-      ],
+      articleList:[],
     }
   },
-
+  mounted(){
+      axios({
+          url : 'http://localhost:14000/blog/getAllBlog',
+          method : 'get',
+      }).then((res)=>{
+          this.articleList = res.data;
+          console.log(res.data);
+      })
+  },
   methods: { //事件处理器
-    showInitDate: function (oldDate, full) {
-      console.log(oldDate, full);
-      return initDate(oldDate, full)
-    },
-    showSearchShowList: function (initpage) {//展示数据
-      var that = this;
-      that.classId = (that.$route.query.classId == undefined ? 0 : parseInt(that.$route.query.classId));//获取传参的classId
-      that.keywords = that.$store.state.keywords;//获取传参的keywords
-      that.classtwoId = that.$route.query.classtwoId == undefined ? '' : parseInt(that.$route.query.classtwoId);//获取传参的classtwoId
-      that.sendId = that.classtwoId ? that.classtwoId : that.classId;
-      that.level = that.keywords ? 0 : that.classtwoId ? 0 : 1;
-      // console.log(that.classId);
-      // ArtClassData(function(msg){
-      // console.log(msg);
-      // that.shareClass = msg;
-      // })
-      //判断当前显示的分类名称 以及子分类
-      // for(var i=0;i<that.shareClass.length;i++){
-      //     if(that.classId==that.shareClass[i].class_id){
-      //         that.className = that.shareClass[i].cate_name;
-      //         if(that.shareClass[i].ChildsSon&&that.shareClass[i].ChildsSon.length>0){
-      //             that.sonclassList = that.shareClass[i].ChildsSon;
-      //         }else{
-      //             that.sonclassList = '';
-      //         }
-      //     }
-      // }
+//      onClick: function(e){
+//          e.preventDefault();
+//          this.$router.push("/detail/:"+e)
+//          this.$router.push({
+//              path: '/detail/',
+//              query: {
+//                  id: e,
+//              }
+//          })
+//      },
+      showSearchShowList: function () {//展示数据
+
+      },
       //初始化 文章id为0开始
-      that.artId = initpage ? 0 : that.artId;
+//      that.artId = initpage ? 0 : that.artId;
       // ShowArticleAll(that.artId,that.sendId,that.keywords,that.level,(result)=>{
       // console.log(result);
       // if(result.code==1001){
@@ -220,8 +156,8 @@ export default {
     routeChange: function () {
       // var that = this;
       this.showSearchShowList(true);
-    }
-  },
+    },
+
   components: { //定义组件
 
   },

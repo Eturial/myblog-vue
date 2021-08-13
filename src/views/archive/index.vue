@@ -3,7 +3,9 @@
     <div class="archive-title">归档</div>
     <div class="archive-class-title">分类</div>
     <ul class="archive-class-all">
-      <li v-for="item in classList" :key="item.id"><a href="/category">{{item.name}}</a><span>（{{item.count}}）</span></li>
+      <li v-for="item in classList" :key="item.tagId">
+        <a :href="'category/'+item.tagId">{{item.tagName}}</a>
+      </li>
     </ul>
     <div class="article-time" v-for="item in articleList" :key="item.year">
       <div class="archive-class-title">{{item.year}}</div>
@@ -17,32 +19,12 @@
 </template>
 
 <script>
+    import axios from 'axios';
 export default {
   name: 'Archive',
   data () {
     return {
-      classList: [
-        {
-          id: 1,
-          name: '分享镜',
-          count: 8
-        },
-        {
-          id: 2,
-          name: '创作集',
-          count: 8
-        },
-        {
-          id: 3,
-          name: '事件簿',
-          count: 89
-        },
-        {
-          id: 4,
-          name: '闲言碎语',
-          count: 8
-        }
-      ],
+      classList: [],
       articleList: [
         {
           year: '2021',
@@ -128,7 +110,17 @@ export default {
     }
   },
   components: {},
-  methods: {},
+    mounted(){
+        axios({
+            url : 'http://localhost:14000/tag/getAllTag',
+            method : 'get',
+        }).then((res)=>{
+            this.classList = res.data;
+            console.log(this.classList);
+        })
+    },
+  methods: {
+  },
   created () { }
 }
 </script>

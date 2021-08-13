@@ -8,7 +8,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
     state () {
         return {
-            name: 'aimee',
+            name: 'aaa',
             errorAvatar: 'this.onerror=null;this.src="' + require('./../assets/img/tou.jpg') + '"'
         }
     },
